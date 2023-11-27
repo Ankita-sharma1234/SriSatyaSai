@@ -1,0 +1,58 @@
+.card{
+    margin: 10px auto;
+    box-shadow: 0px 2px 4px 0 rgba(0,0,0,0.2);
+    border-radius: 10px;
+    height: 100%;
+    transition: 0.3s;
+  }
+.card:hover {
+  box-shadow: 1px 10px 16px 0 rgba(0,0,0,0.3);
+}
+  .card-title{
+    text-align: center;
+    color: #666666;
+    font-weight: bold;
+
+  }
+
+  .card-text{
+        font-weight: 800;
+  color:black;
+  font-family: 'Fira Sans', sans-serif;
+  }
+  .card-text a h4{
+    font-weight: bold;
+    color:rgb(31, 30, 30);
+
+  }
+  .card-image{
+    text-align: center;
+    margin-left:25%;
+    margin-top: 4vh;
+    margin-bottom: 4vh;
+   
+   
+
+  }
+  .card-text{
+    text-align: center;
+
+  }
+
+  .title-heading{
+    font-size: 3em;
+    text-align: center;
+    margin: 3%;
+    font-weight: bold;
+
+  }
+  .erpBG{
+    background-image: url("../../HomePage/campus.png");
+  }
+  .cardCont{
+    backdrop-filter: blur(11px) saturate(180%);
+    -webkit-backdrop-filter: blur(11px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.17);
+    height: 100%;
+    width: 100%;
+  }
