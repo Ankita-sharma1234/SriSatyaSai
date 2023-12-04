@@ -45,6 +45,7 @@ function App() {
       return <Navigate to={`/studentlogin`} />;
     }
   }
+  //comment for checking , Alex ......................
   return (
     <>
       <Routes>
@@ -61,7 +62,7 @@ function App() {
         <Route path='/studentpending' element={< Pending />} />
         <Route path='/studentverify' element={<Verify />} />
         <Route path='/PaymentPage' element={<PaymentPage />} />
-
+ 
         <Route
           path="/selectCourse"
           element={<PrivateRoute element={<Course />} />}

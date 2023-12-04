@@ -12,8 +12,12 @@ import {
   Alert,
   AlertIcon,
 } from "@chakra-ui/react";
+import { Container, Row, Col } from "react-bootstrap";
+import Table from "react-bootstrap/Table";
+
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import firebase from "./firebase";
 import swal from "sweetalert";
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -30,6 +34,111 @@ export default function Signup() {
   const otpInputRef = useRef(null);
   const navigate = useNavigate();
   const emailRegex = /^[^\s@]+@[^\s@]+\.(com)$/i;
+  const [otp2, setOtp2] = useState("");
+
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [formData, setFormData] = useState({
+    mobile: "",
+    otp2: "",
+    showRegistrationForm: false,
+  });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+
+
+
+
+  const configureCaptcha = () => {
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+      "sign-in-button",
+      {
+        size: "invisible",
+        callback: (response) => {
+          onSignInSubmit();
+          console.log("Recaptcha verified");
+        },
+        defaultCountry: "IN",
+      }
+    );
+  };
+  const onSignInSubmit = (e) => {
+    e.preventDefault();
+    configureCaptcha();
+    const phoneNumber = "+91" + formData.mobile;
+    console.log(phoneNumber);
+    const appVerifier = window.recaptchaVerifier;
+
+    firebase
+      .auth()
+      .signInWithPhoneNumber(phoneNumber, appVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        console.log("OTP has been sent");
+        setShowOtpInput(true);
+
+        swal({
+          title: "OTP Sent Successfully",
+          text: `OTP sent your Mobile No.  ${formData.mobile} please enter otp!!!! `,
+          icon: "success",
+          showConfirmButton: false,
+          timer: 10000,
+        });
+      })
+      .catch((error) => {
+        console.log("SMS not sent");
+        console.log(error)
+      });
+  };
+  const onSubmitOTP = (e) => {
+    e.preventDefault();
+    const code = formData.otp2;
+    console.log(code, "submit");
+
+    if (window.confirmationResult && code) {
+      window.confirmationResult
+        .confirm(code)
+        .then((result) => {
+          const user = result.user;
+          console.log(JSON.stringify(user));
+          if (result.success) {
+            swal({
+              title: "Congratulations",
+              text: "Registration done successfullly!",
+              icon: "success",
+              showConfirmButton: true,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                alert("confirmed");
+              }
+            });
+          } else {
+            console.log("Registration update failed");
+          }
+        })
+        .catch((error) => {
+          // Handle error
+          console.error("Error confirming OTP:", error);
+          swal({
+            title: "ERROR",
+            text: "Error confirming OTP. Please try again.",
+            icon: "ERROR",
+            showConfirmButton: true,
+          });
+        });
+    } else {
+      console.error("Confirmation result or OTP code is missing.");
+    }
+  };
+
+
+
+
 
   const sendEmail = async (e) => {
     e.preventDefault();
@@ -147,6 +256,26 @@ export default function Signup() {
     }
   }, [show]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
   return (
     <>
       {show ? (
@@ -246,12 +375,12 @@ export default function Signup() {
               </FormControl>
 
               {otpSent && (
-                <FormControl id="otp" isRequired>
+                <FormControl id="otp2" isRequired>
                   <FormLabel>Enter OTP</FormLabel>
                   <Input
                     type="number"
-                    name="otp"
-                    value={otp}
+                    name="otp2"
+                    value={otp2}
                     onChange={(e) => setOtp(e.target.value)}
                     ref={otpInputRef}
                   />
@@ -314,6 +443,44 @@ export default function Signup() {
           </Box>
         </Stack>
       </Flex>
+      <Row className="form-input">
+          <Col xs={12} md={6}>
+            <form onSubmit={onSignInSubmit}>
+              <div id="sign-in-button"></div>
+              <Input
+                style={{ marginTop: "8px" }}
+                type="number"
+                name="mobile"
+                placeholder="Mobile No."
+                required
+                autoComplete="off"
+                value={formData.mobile}
+                onChange={handleChange}
+              />
+                              <Button style={{ marginTop: "8px" }} type="submit">
+                  Submit
+                </Button>
+            </form>
+          </Col> 
+          {showOtpInput && (
+            <Col xs={12} md={6}>
+              <form onSubmit={onSubmitOTP}>
+                <Input
+                  style={{ marginTop: "8px" }}
+                  type="number"
+                  name="otp2"
+                  placeholder="OTP No."
+                  required
+                  value={formData.otp2}
+                  onChange={handleChange}
+                />
+                <Button style={{ marginTop: "8px" }} type="submit">
+                  Submit
+                </Button>
+              </form>
+            </Col>
+          )}
+        </Row>
     </>
   );
 }
